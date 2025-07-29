@@ -373,7 +373,7 @@ echo "*** Check of Jenkins job complete before you continue update the autofs ma
 echo ""
 
 # Path to the script to check
-CHECK_SCRIPT="$SCRIPT_BASE/scripts/Jenkins_status.sh"
+CHECK_SCRIPT="$SCRIPT_BASE/Jenkins_status.sh"
 
 while true; do
     echo ""
