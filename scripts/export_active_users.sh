@@ -20,10 +20,10 @@ print_user_description=false
 print_title=false
 
 # LDAP connection settings
-ldap_server="x-dc01.amitay.dev"
-bind_dn="admin@amitay.dev"
-base_dn="OU=Users,OU=amitay.dev,DC=amitay,DC=dev"
-ldap_pass="/tools/IT/secret/.ldap"
+ldap_server="x-dc01.exmaple.local"
+bind_dn="admin@exmaple.local"
+base_dn="OU=Users,OU=exmaple.local,DC=exmaple,DC=local"
+ldap_pass="/home/aviela/secret/.ldap"
 
 # Parse flags
 while getopts ":demfuitap" opt; do

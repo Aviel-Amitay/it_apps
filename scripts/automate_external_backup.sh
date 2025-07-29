@@ -13,7 +13,7 @@
 # === Config ===
 DEFAULT_RETENTION=60
 BACKUP_SRC="/mnt/backups"
-DISK_OPTIONS=("192.168.130.134:/backup" "192.168.130.135:/backup")
+DISK_OPTIONS=("192.168.1.229:/backup" "192.168.130.135:/backup")
 MOUNT_POINTS=("/mnt/bck04" "/mnt/bck05")
 
 # === Update user who initial the process ===
@@ -31,7 +31,7 @@ if [[ -z "$SCRIPT_USER" ]]; then
 fi
 
 # User info
-SUFFIX="amitay.dev"
+SUFFIX="exmaple.local"
 SCRIPT_USER_EMAIL="${SCRIPT_USER}@"$SUFFIX""
 EMAIL_RECIPIENTS=( "aviela@$SUFFIX" "it@$SUFFIX" "$SCRIPT_USER_EMAIL" )
 EMAIL_RECIPIENTS_EXTERNAL=( "aviela@$SUFFIX" "it@$SUFFIX" "info@example.co.il" "$SCRIPT_USER_EMAIL" )
@@ -285,8 +285,7 @@ Backup disk $DISK_NAME is ready for pickup.
 Please return with you the second backup disk.
 
 Contact info:
-Sagi - 054-3109634
-Dvir - 054-6800987
+
 
 Internal note - Backup days: $RETENTION.
 Disk usage: 
