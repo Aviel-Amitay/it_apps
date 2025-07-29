@@ -12,6 +12,7 @@
 #########################
 # Global Configuration #
 #########################
+SCRIPT_BASE="/it_apps/scripts"
 
 # Help
 
@@ -284,11 +285,11 @@ echo "Run $projectname debug_mode"
     if [[ ! -d "$work_dir" ]]; then
         echo "user directory for '$username' not found under /projects/$projectname/work."
         echo "executing external script "create_project_work_dir.sh" to create the work directory..."
-        sh /tools/IT/it_services/scripts/create_project_work_dir.sh -user "$username" -project "$projectname" -copy "$copy_enabled"
+        sh "$SCRIPT_BASE/create_project_work_dir.sh" -user "$username" -project "$projectname" -copy "$copy_enabled"
         echo ""
         echo "Run external script "update_autofs_maps""
         # sh /home/aviela/it_services/scripts/update_autofs_maps.sh -user "$username" -project "$projectname" -copy "$copy_enabled" -whoami "$it_username"
-        sh /tools/IT/it_services/scripts/update_autofs_maps.sh -user "$username" -project "$projectname" -copy "$copy_enabled" -whoami "$it_username"
+        sh "$SCRIPT_BASE/update_autofs_maps.sh" -user "$username" -project "$projectname" -copy "$copy_enabled" -whoami "$it_username"
     fi
 
     echo ""
@@ -372,7 +373,7 @@ echo "*** Check of Jenkins job complete before you continue update the autofs ma
 echo ""
 
 # Path to the script to check
-CHECK_SCRIPT="/tools/IT/scripts/chef/Jenkins_status.sh"
+CHECK_SCRIPT="$SCRIPT_BASE/scripts/Jenkins_status.sh"
 
 while true; do
     echo ""
@@ -439,10 +440,10 @@ read -t 200 -p "Would you like to update autofs maps? [y/n]: " confirmation
 if [[ "$confirmation" =~ ^[yY]$ ]]; then
     echo "Running external script 'upload_cookbook.sh'"
     echo ""
-    sh /tools/IT/it_services/scripts/upload_cookbook.sh 
+    sh "$SCRIPT_BASE/upload_cookbook.sh "
     echo ""
     echo "Update update_autofs_maps"
-    sh /tools/IT/it_services/scripts/run_full_chef_client.sh -role tags:update_autofs_maps ; exit  
+    sh "$SCRIPT_BASE/run_full_chef_client.sh" -role tags:update_autofs_maps ; exit  
 else
   echo "Autofs maps update skipped."
 fi

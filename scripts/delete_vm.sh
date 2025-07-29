@@ -14,7 +14,7 @@ read -p "Insert VM name: " vmn
 
 # Domain Controller and DNS Server Details
 username="administrator@amitay"
-domain="amitay.dev"
+domain="exmaple.local"
 server="x-dc02"
 domain_info="$username"
 
