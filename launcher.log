@@ -11,3 +11,4 @@
 2025-07-22 17:26:36 | dany | compare_rpms.sh | Compare RPMs between hosts
 2025-07-22 17:27:12 | dany | speed_test.sh | Run Speed test
 2025-07-22 17:27:26 | dany | add_user_to_ad.sh | Add a user to AD
+2025-07-29 14:03:11 | aviela | upload_cookbook.sh | Upload a cookbook
