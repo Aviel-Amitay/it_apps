@@ -2,9 +2,16 @@
 
 #set -x
 
-SCRIPT_BASE="/it_services/scripts"
-ALT_SCRIPT_DIR="$SCRIPT_BASE/linux_env"
-LOG_FILE="./launcher.log"
+SCRIPT_BASE="/it_apps/scripts"
+
+if [[ ! -d "$SCRIPT_BASE" ]]; then
+  echo "❌ ERROR: SCRIPT_BASE directory '$SCRIPT_BASE' not found!"
+  exit 1
+fi
+
+LINUX_SCRIPT_DIR="$SCRIPT_BASE/linux_env"
+CHEF_SCRIPT_DIR="$SCRIPT_BASE/chef"
+LOG_FILE="$SCRIPT_BASE/launcher.log"
 
 # Prompt for the initiating user if not already set
 if [[ -z "$it_username" ]]; then
@@ -34,7 +41,7 @@ ENV_ACTIONS=(
 )
 
 MACHINE_ACTIONS=(
-  "bootstrap_machine_new.sh:Bootstrap a new machine"
+  "bootstrap_machine.sh:Bootstrap a new machine"
   "run_full_chef_client.sh:Full chef-client on specific role"
   "run_autofs_chef_client.sh:Chef-client for autofs maps [VLSI]"
   "compare_rpms.sh:Compare RPMs between hosts"
@@ -79,8 +86,10 @@ run_script_menu() {
       # Find the script path
       if [[ -f "$SCRIPT_BASE/$script_file" ]]; then
         full_path="$SCRIPT_BASE/$script_file"
-      elif [[ -f "$ALT_SCRIPT_DIR/$script_file" ]]; then
-        full_path="$ALT_SCRIPT_DIR/$script_file"
+      elif [[ -f "$LINUX_SCRIPT_DIR/$script_file" ]]; then
+        full_path="$LINUX_SCRIPT_DIR/$script_file"
+      elif [[ -f "$CHEF_SCRIPT_DIR/$script_file" ]]; then
+        full_path="$CHEF_SCRIPT_DIR/$script_file"
       else
         echo "Error: $script_file not found."
         return
