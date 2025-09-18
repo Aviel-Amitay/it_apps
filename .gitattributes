@@ -1,0 +1,33 @@
+# Normalize all text files to LF in the repo and on checkout
+*        text=auto eol=lf
+
+# Unixy stuff should always be LF
+*.sh     text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.json   text eol=lf
+*.py     text eol=lf
+*.cfg    text eol=lf
+*.txt    text eol=lf
+*.gitignore text eol=lf
+
+# Windows-only scripts can keep CRLF on checkout
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+*.ps1    text eol=crlf
+
+# Binary files: never touch line endings
+*.png    -text
+*.jpg    -text
+*.jpeg   -text
+*.gif    -text
+*.ico    -text
+*.pdf    -text
+*.zip    -text
+*.gz     -text
+*.tgz    -text
+*.7z     -text
+*.exe    -text
+*.dll    -text
+*.so     -text
