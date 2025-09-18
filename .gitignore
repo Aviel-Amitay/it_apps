@@ -2,3 +2,6 @@
 
 # FILES
 launcher.log
+
+# Logs
+*.log
