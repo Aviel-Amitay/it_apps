@@ -39,12 +39,12 @@ read -p "Insert First Name: " fname
 		;;
 	esac
 
-	ssh -l administrator@amitay x-dc01 "dsadd user "CN=$fname,OU=Users,OU=exmaple.local,DC=exmaple,DC=local" -samid $username -upn $username@exmaple.local -fn $fname -ln $lname -display $fname -disabled no -pwd $pass -dept $depart -email $username@exmaple.local -tel $phone -title $title -memberof $grp $rnd $vpn "
+	ssh -l administrator@amitay x-dc01 "dsadd user "CN=$fname,OU=Users,OU=exmaple.local,DC=exmaple,DC=local" -samid $username -upn $username@amitay.dev -fn $fname -ln $lname -display $fname -disabled no -pwd $pass -dept $depart -email $username@amitay.dev -tel $phone -title $title -memberof $grp $rnd $vpn "
 	echo "Account for $fname $lname is ready.
 		Username:	$username
 		Password:	$pass
 		Department:	$depart
 		Manager:	
-		Phone Number:	$phone" | mail -s "Amitay.dev - New Account Created!" it@exmaple.local
+		Phone Number:	$phone" | mail -s "Amitay.dev - New Account Created!" it@amitay.dev
 	exit
 	;;

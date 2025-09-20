@@ -34,7 +34,7 @@ fi
 SUFFIX="exmaple.local"
 SCRIPT_USER_EMAIL="${SCRIPT_USER}@"$SUFFIX""
 EMAIL_RECIPIENTS=( "aviela@$SUFFIX" "it@$SUFFIX" "$SCRIPT_USER_EMAIL" )
-EMAIL_RECIPIENTS_EXTERNAL=( "aviela@$SUFFIX" "it@$SUFFIX" "info@example.co.il" "$SCRIPT_USER_EMAIL" )
+EMAIL_RECIPIENTS_EXTERNAL=( "aviela@$SUFFIX" "it@$SUFFIX" "info@vendor.com" "$SCRIPT_USER_EMAIL" )
 
 # === Auto-Detect Connected Backup Disks ===
 AVAILABLE_DISKS=()
