@@ -22,7 +22,7 @@ print_title=false
 # LDAP connection settings
 ldap_server="x-dc01.exmaple.local"
 bind_dn="admin@amitay.dev"
-base_dn="OU=Users,OU=exmaple.local,DC=exmaple,DC=local"
+base_dn="OU=Users,OU=example.local,DC=example,DC=local"
 ldap_pass="/home/aviela/secret/.ldap"
 
 # Parse flags

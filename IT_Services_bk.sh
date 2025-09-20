@@ -245,26 +245,26 @@ case "$target" in
 	username=`echo $username |tr [:upper:] [:lower:]`
 	pass=`echo $username | cut -c 1 | tr [:lower:] [:upper:]`
 	pass="Welcome"$pass"1"
-	dn="CN=$fname,OU=Users,OU=amitay.dev,DC=amitay,DC=dev"
-	mng="CN=$manager,OU=Users,OU=amitay.dev,DC=amitay,DC=dev"
-	sw="CN=sw,OU=Groups,OU=amitay.dev,DC=amitay,DC=dev"
-	vlsi="CN=vlsi,OU=Groups,OU=amitay.dev,DC=amitay,DC=dev"
-	rnd="CN=R&D-All,OU=Groups,OU=amitay.dev,DC=amitay,DC=dev"
-	vpn="CN=VPN_Users,OU=Groups,OU=amitay.dev,DC=amitay,DC=dev"
+	dn="CN=$fname,OU=Users,OU=example.local,DC=example,DC=local"
+	mng="CN=$manager,OU=Users,OU=example.local,DC=example,DC=local"
+	sw="CN=sw,OU=Groups,OU=example.local,DC=example,DC=local"
+	vlsi="CN=vlsi,OU=Groups,OU=example.local,DC=example,DC=local"
+	rnd="CN=R&D-All,OU=Groups,OU=example.local,DC=example,DC=local"
+	vpn="CN=VPN_Users,OU=Groups,OU=example.local,DC=example,DC=local"
 
 	echo "Username: "$username
 	echo "Password: "$pass
 
 	case $depart in
 		"SW")
-		grp="CN=sw,OU=Groups,OU=amitay.dev,DC=amitay,DC=dev"
+		grp="CN=sw,OU=Groups,OU=example.local,DC=example,DC=local"
 		;;
 		"VLSI")
-		grp="CN=vlsi,OU=Groups,OU=amitay.dev,DC=amitay,DC=dev"
+		grp="CN=vlsi,OU=Groups,OU=example.local,DC=example,DC=local"
 		;;
 	esac
 
-	ssh -l administrator@amitay x-dc01 "dsadd user "CN=$fname,OU=Users,OU=amitay.dev,DC=amitay,DC=dev" -samid $username -upn $username@amitay.dev -fn $fname -ln $lname -display $fname -disabled no -pwd $pass -dept $depart -email $username@amitay.dev -tel $phone -title $title -memberof $grp $rnd $vpn "
+	ssh -l administrator@amitay x-dc01 "dsadd user "CN=$fname,OU=Users,OU=example.local,DC=example,DC=local" -samid $username -upn $username@amitay.dev -fn $fname -ln $lname -display $fname -disabled no -pwd $pass -dept $depart -email $username@amitay.dev -tel $phone -title $title -memberof $grp $rnd $vpn "
 	echo "Account for $fname $lname is ready.
 		Username:	$username
 		Password:	$pass
