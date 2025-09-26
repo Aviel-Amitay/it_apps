@@ -15,8 +15,8 @@
 set -euo pipefail
 
 ROOT_DIR="/mnt/x/it_apps"
-SCRIPT_BASE="$ROOT_DIR/scripts2"
-LAUNCHER_FILE="$ROOT_DIR/launcher-app.sh.bk"
+SCRIPT_BASE="$ROOT_DIR/scripts"
+LAUNCHER_FILE="$ROOT_DIR/launcher-app.sh"
 LOG_FILE="$ROOT_DIR/customize_company_updated.log"
 DRY_RUN=false
 
