@@ -17,7 +17,7 @@ DEFAULT_ENABLE_NAT="yes"
 DEFAULT_PUBLIC_AUTO_IP="yes"
 
 ###############################################################################
-# Build result storage
+# Build result VPCs
 ###############################################################################
 BUILT_VPC_IDS=()
 BUILT_VPC_NAMES=()
