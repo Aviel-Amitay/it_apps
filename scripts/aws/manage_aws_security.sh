@@ -588,6 +588,28 @@ attach_security_group_to_instance() {
   log "Attached security group $sg_id to instance $instance_id via ENI $eni_id"
 }
 
+delete_security_group() {
+  local vpc_id="$1"
+  local sg_id
+  local confirm_delete
+
+  prompt_security_group_id "$vpc_id"
+  sg_id="$SELECTED_SG_ID"
+
+  show_security_group_details "$sg_id"
+  prompt_yes_no confirm_delete "Delete security group $sg_id?" "no"
+
+  if [[ "$confirm_delete" != "yes" ]]; then
+    log "Deletion cancelled for security group $sg_id"
+    return 0
+  fi
+
+  aws_cli ec2 delete-security-group \
+    --group-id "$sg_id"
+
+  log "Deleted security group $sg_id"
+}
+
 security_group_main_menu() {
   local vpc_id
   local action
@@ -602,6 +624,7 @@ security_group_main_menu() {
       "Create new security group" \
       "Modify existing security group" \
       "Attach security group to EC2" \
+      "Delete security group" \
       "Back to main menu"
 
     case "$action" in
@@ -621,6 +644,9 @@ security_group_main_menu() {
         ;;
       "Attach security group to EC2")
         attach_security_group_to_instance "$vpc_id"
+        ;;
+      "Delete security group")
+        delete_security_group "$vpc_id"
         ;;
       "Back to main menu")
         return 0
@@ -655,7 +681,7 @@ create_key_pair_workflow() {
 
   case "$key_type_choice" in
     "pem")
-      output_file="${KEY_OUTPUT_DIR}/${key_name}.pem"
+      output_file="${KEY_OUTPUT_DIR}/aws-$(date +%Y-%m-%d)-${key_name}.pem"
       aws_cli ec2 create-key-pair \
         --key-name "$key_name" \
         --query 'KeyMaterial' \
@@ -665,7 +691,7 @@ create_key_pair_workflow() {
       echo "Saved private key to: $output_file"
       ;;
     "ppk")
-      pem_file="${KEY_OUTPUT_DIR}/${key_name}.pem"
+      pem_file="${KEY_OUTPUT_DIR}/aws-$(date +%Y-%m-%d)-${key_name}.pem"
       aws_cli ec2 create-key-pair \
         --key-name "$key_name" \
         --query 'KeyMaterial' \
@@ -678,13 +704,92 @@ create_key_pair_workflow() {
   esac
 }
 
+delete_key_pair_workflow() {
+  local key_lines=()
+  local line
+  local choice
+  local idx=1
+  local key_name
+  local confirm_delete
+  local pem_file
+
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && key_lines+=("$line")
+  done < <(
+    aws_cli ec2 describe-key-pairs \
+      --query 'KeyPairs[*].[KeyName,KeyType,KeyFingerprint]' \
+      --output text
+  )
+
+  [[ "${#key_lines[@]}" -gt 0 ]] || die "No key pairs found in region $AWS_REGION"
+
+
+  echo
+  echo "Available key pairs:"
+  printf "  %-3s %-30s %-12s\n" "No." "KeyName" "KeyType"
+  printf "  %-3s %-30s %-12s\n" "---" "------------------------------" "------------"
+
+  for line in "${key_lines[@]}"; do
+    local list_key_name list_key_type
+    list_key_name="$(awk '{print $1}' <<< "$line")"
+    list_key_type="$(awk '{print $2}' <<< "$line")"
+
+    printf "  %-3s %-30s %-12s\n" "$idx)" "$list_key_name" "$list_key_type"
+    idx=$((idx+1))
+  done
+  echo
+ 
+  while true; do
+    read -r -p "Choose key pair number to delete: " choice
+    if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#key_lines[@]} )); then
+      key_name="$(awk '{print $1}' <<< "${key_lines[$((choice-1))]}")"
+      break
+    fi
+    echo "Invalid selection."
+  done
+
+  echo
+  echo "Selected key pair:"
+  aws_cli ec2 describe-key-pairs \
+    --key-names "$key_name" \
+    --query 'KeyPairs[0].{KeyName:KeyName,KeyType:KeyType,Fingerprint:KeyFingerprint}' \
+    --output table
+
+  prompt_yes_no confirm_delete "Are you sure you want to delete key pair $key_name?" "no"
+  if [[ "$confirm_delete" != "yes" ]]; then
+    log "Deletion cancelled for key pair $key_name"
+    return 0
+  fi
+
+  aws_cli ec2 delete-key-pair \
+    --key-name "$key_name"
+
+  log "Deleted key pair $key_name"
+  echo ""
+
+  pem_file="$(ls "${KEY_OUTPUT_DIR}"/*"${key_name}"*.pem 2>/dev/null | head -n1)"
+
+  echo ""
+  echo "Deleted key pair $key_name from AWS. Now checking for local PEM file to remove..."
+  echo "Expected local PEM file path: $pem_file"
+  echo ""
+
+  if [[ -f "$pem_file" ]]; then
+    rm -f "$pem_file"
+    log "Removed local PEM file: $pem_file"
+  else
+    log "No local PEM file found for $key_name"
+  fi
+}
+
 key_pair_main_menu() {
   local action
 
   while true; do
     prompt_menu action "Key pair menu" \
       "List existing key pairs" \
-      "Create new key pair" \
+      "Create a new SSH key pair" \
+      "Delete SSH key pair" \
       "Back to main menu"
 
     case "$action" in
@@ -701,8 +806,11 @@ key_pair_main_menu() {
             ;;
         esac
         ;;
-      "Create new key pair")
+      "Create a new SSH key pair")
         create_key_pair_workflow
+        ;;
+      "Delete SSH key pair")
+        delete_key_pair_workflow
         ;;
       "Back to main menu")
         return 0
