@@ -683,7 +683,7 @@ create_key_pair_workflow() {
     "pem")
       output_file="${KEY_OUTPUT_DIR}/aws-$(date +%Y-%m-%d)-${key_name}.pem"
       aws_cli ec2 create-key-pair \
-        --key-name "$key_name" \
+        --key-name "aws-$(date +%Y-%m-%d)-$key_name" \
         --query 'KeyMaterial' \
         --output text > "$output_file"
       chmod 600 "$output_file"
