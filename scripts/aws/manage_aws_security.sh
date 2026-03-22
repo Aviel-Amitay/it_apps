@@ -7,6 +7,9 @@ set -euo pipefail
 AWS_PROFILE="${AWS_PROFILE:-default}"
 AWS_REGION="${AWS_REGION:-il-central-1}"
 SCRIPT_NAME="$(basename "$0")"
+JSON_OUTPUT="no"
+CREATE_KEY_ONLY="no"
+REGION_FORWARDED="no"
 
 DEFAULT_OFFICE_CIDR="172.20.1.0/16"
 DEFAULT_WEB_PORTS="80,443,8080,8443,3000,123"
@@ -40,6 +43,8 @@ Usage:
 Options:
   -p, --profile NAME   AWS CLI profile to use (default: ${AWS_PROFILE})
   -r, --region  NAME   AWS region to use (default: ${AWS_REGION})
+      --create-key     Jump directly to key pair creation
+      --json           Print machine-readable JSON for delegated flows
   -h, --help           Show this help
 
 What this script can do:
@@ -93,7 +98,7 @@ prompt_required() {
       printf -v "$__var_name" '%s' "$__input"
       return 0
     fi
-    echo "Value is required."
+    echo "Value is required." >&2
   done
 }
 
@@ -119,7 +124,7 @@ prompt_yes_no() {
         return 0
         ;;
       *)
-        echo "Please enter yes or no."
+        echo "Please enter yes or no." >&2
         ;;
     esac
   done
@@ -133,11 +138,11 @@ prompt_menu() {
   local __input
 
   while true; do
-    echo
-    echo "$__prompt"
+    echo >&2
+    echo "$__prompt" >&2
     local i=1
     for opt in "${__options[@]}"; do
-      echo "  $i) $opt"
+      echo "  $i) $opt" >&2
       i=$((i+1))
     done
     read -r -p "Choose an option: " __input
@@ -145,9 +150,61 @@ prompt_menu() {
       printf -v "$__var_name" '%s' "${__options[$((__input-1))]}"
       return 0
     fi
+    echo "Invalid selection." >&2
+  done
+}
+
+###############################################################################
+# Region helpers
+###############################################################################
+get_regions() {
+  aws_cli ec2 describe-regions --query 'Regions[].RegionName' --output text
+}
+
+print_regions() {
+  local region="$1"
+  log "Available AWS regions:"
+  get_regions | tr '\t' '\n' | sed 's/^/  - /'
+}
+
+prompt_region_selection() {
+  local region_lines=()
+  local line
+  local choice
+  local idx=1
+
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && region_lines+=("$line")
+  done < <(get_regions | tr '\t' '\n')
+
+  [[ "${#region_lines[@]}" -gt 0 ]] || die "No AWS regions returned for profile $AWS_PROFILE"
+
+  echo
+  echo "Available AWS regions:"
+  for line in "${region_lines[@]}"; do
+    if [[ "$line" == "$AWS_REGION" ]]; then
+      echo "  $idx) $line (default)"
+    else
+      echo "  $idx) $line"
+    fi
+    idx=$((idx+1))
+  done
+  echo
+
+  while true; do
+    read -r -p "Choose region number [default: $AWS_REGION]: " choice
+    if [[ -z "$choice" ]]; then
+      return 0
+    fi
+
+    if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#region_lines[@]} )); then
+      AWS_REGION="${region_lines[$((choice-1))]}"
+      return 0
+    fi
     echo "Invalid selection."
   done
 }
+
 
 ###############################################################################
 # VPC / EC2 discovery
@@ -669,6 +726,7 @@ create_key_pair_workflow() {
   local key_type_choice
   local output_file
   local pem_file
+  local aws_key_name
 
   mkdir -p "$KEY_OUTPUT_DIR"
   chmod 700 "$KEY_OUTPUT_DIR" || true
@@ -681,25 +739,37 @@ create_key_pair_workflow() {
 
   case "$key_type_choice" in
     "pem")
-      output_file="${KEY_OUTPUT_DIR}/aws-$(date +%Y-%m-%d)-${key_name}.pem"
+      aws_key_name="aws-$(date +%Y-%m-%d)-${AWS_REGION}-${key_name}"
+      output_file="${KEY_OUTPUT_DIR}/${aws_key_name}.pem"
       aws_cli ec2 create-key-pair \
-        --key-name "aws-$(date +%Y-%m-%d)-$key_name" \
+        --key-name "$aws_key_name" \
         --query 'KeyMaterial' \
         --output text > "$output_file"
       chmod 600 "$output_file"
-      log "Created key pair $key_name"
-      echo "Saved private key to: $output_file"
+      log "Created key pair $aws_key_name"
+      if [[ "$JSON_OUTPUT" == "yes" ]]; then
+        printf '{"key_name":"%s","key_type":"pem","output_file":"%s","region":"%s"}\n' \
+          "$aws_key_name" "$output_file" "$AWS_REGION"
+      else
+        echo "Saved private key to: $output_file"
+      fi
       ;;
     "ppk")
+      aws_key_name="$key_name"
       pem_file="${KEY_OUTPUT_DIR}/aws-$(date +%Y-%m-%d)-${key_name}.pem"
       aws_cli ec2 create-key-pair \
-        --key-name "$key_name" \
+        --key-name "$aws_key_name" \
         --query 'KeyMaterial' \
         --output text > "$pem_file"
       chmod 600 "$pem_file"
-      log "Created key pair $key_name"
-      echo "AWS CLI saved the private key as PEM: $pem_file"
-      echo "To use PPK, convert the PEM file with PuTTYgen."
+      log "Created key pair $aws_key_name"
+      if [[ "$JSON_OUTPUT" == "yes" ]]; then
+        printf '{"key_name":"%s","key_type":"ppk","output_file":"%s","region":"%s"}\n' \
+          "$aws_key_name" "$pem_file" "$AWS_REGION"
+      else
+        echo "AWS CLI saved the private key as PEM: $pem_file"
+        echo "To use PPK, convert the PEM file with PuTTYgen."
+      fi
       ;;
   esac
 }
@@ -833,7 +903,16 @@ parse_args() {
       -r|--region)
         [[ $# -lt 2 ]] && die "Missing value for $1"
         AWS_REGION="$2"
+        REGION_FORWARDED="yes"
         shift 2
+        ;;
+      --create-key)
+        CREATE_KEY_ONLY="yes"
+        shift
+        ;;
+      --json)
+        JSON_OUTPUT="yes"
+        shift
         ;;
       -h|--help)
         usage
@@ -853,6 +932,19 @@ main() {
   require_command awk
   require_command xargs
   require_command tr
+
+  if [[ "$CREATE_KEY_ONLY" == "yes" ]]; then
+    log "Using AWS profile: $AWS_PROFILE"
+    log "Using AWS region : $AWS_REGION"
+    create_key_pair_workflow
+    exit 0
+  fi
+
+  if [[ "$REGION_FORWARDED" == "yes" ]]; then
+    log "Using forwarded region: $AWS_REGION"
+  else
+    prompt_region_selection
+  fi
 
   log "Using AWS profile: $AWS_PROFILE"
   log "Using AWS region : $AWS_REGION"

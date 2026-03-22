@@ -5,6 +5,7 @@ set -euo pipefail
 # Globals / defaults
 ###############################################################################
 SCRIPT_NAME="$(basename "$0")"
+JSON_OUTPUT=false
 
 AWS_PROFILE="${AWS_PROFILE:-default}"
 DRY_RUN="no"
@@ -50,12 +51,16 @@ Options:
   -p, --profile NAME     AWS CLI profile to use (default: current env/default)
   -n, --dry-run          Prompt only, print plan, do not create resources
   -y, --yes              Auto-approve final confirmation
+  -r, --region REGION    Force all VPCs to be created in this region (overrides prompts)
+  --json                 Output created resource IDs in JSON format
   -h, --help             Show this help
 
 Examples:
   ./build_multi_vpc.sh
   ./build_multi_vpc.sh --profile mylab
   ./build_multi_vpc.sh --profile mylab --dry-run
+  ./build_multi_vpc.sh --profile mylab --json
+  ./build_multi_vpc.sh --region us-west-2
   ./build_multi_vpc.sh -p mylab -y
 
 Notes:
@@ -217,7 +222,13 @@ collect_vpc_inputs() {
   echo "Available AWS regions:"
   print_regions
   echo
-  prompt_with_default "VPC_REGION_$idx" "VPC #$idx region" "$default_region"
+  if [[ -n "$AWS_REGION" ]]; then
+    eval "VPC_REGION_$idx=\"$AWS_REGION\""
+    echo "[INFO] Using forwarded region for VPC #$idx: $AWS_REGION"
+  else
+    prompt_with_default "VPC_REGION_$idx" "VPC #$idx region" "$default_region"
+  fi
+  # prompt_with_default "VPC_REGION_$idx" "VPC #$idx region" "$default_region"
   prompt_with_default "VPC_NAME_$idx"   "VPC #$idx name tag" "vpc-$idx"
   prompt_with_default "VPC_CIDR_$idx"   "VPC #$idx IPv4 CIDR" "10.$idx.0.0/16"
 
@@ -538,6 +549,7 @@ build_one_vpc() {
   private_rt_id="$(create_route_table "$region" "$vpc_id" "${name}-private-rt")"
   log "Created private route table: $private_rt_id"
 
+
   if [[ "$enable_nat" == "yes" ]]; then
     log "Creating NAT Gateway in public subnet..."
     nat_id="$(create_nat_gateway "$region" "$public_subnet_id" "${name}-nat")"
@@ -551,6 +563,29 @@ build_one_vpc() {
 
   log "Associating private route table with private subnet..."
   associate_route_table "$region" "$private_rt_id" "$private_subnet_id"
+
+
+  if [[ "$JSON_OUTPUT" == true ]]; then
+    jq -n \
+      --arg region "$region" \
+      --arg vpc_id "$vpc_id" \
+      --arg public_subnet_id "$public_subnet_id" \
+      --arg private_subnet_id "$private_subnet_id" \
+      --arg igw_id "$igw_id" \
+      --arg public_route_table_id "$public_rtb_id" \
+      --arg private_route_table_id "$private_rtb_id" \
+      --arg nat_gateway_id "${nat_gateway_id:-}" \
+      '{
+        region: $region,
+        vpc_id: $vpc_id,
+        public_subnet_id: $public_subnet_id,
+        private_subnet_id: $private_subnet_id,
+        igw_id: $igw_id,
+        public_route_table_id: $public_route_table_id,
+        private_route_table_id: $private_route_table_id,
+        nat_gateway_id: (if $nat_gateway_id == "" or $nat_gateway_id == "N/A" then null else $nat_gateway_id end)
+      }'
+  fi
 
   BUILT_VPC_IDS[$idx]="$vpc_id"
   BUILT_VPC_NAMES[$idx]="$name"
@@ -571,6 +606,7 @@ build_one_vpc() {
   echo "===================================================="
   echo
 }
+
 
 ###############################################################################
 # Argument parsing
@@ -637,6 +673,8 @@ post_build_nat_workflow() {
 
 # End
 
+AWS_REGION=""
+
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -651,6 +689,15 @@ parse_args() {
         ;;
       -y|--yes)
         AUTO_APPROVE="yes"
+        shift
+        ;;
+      --region)
+        [[ $# -lt 2 ]] && die "Missing value for $1"
+        AWS_REGION="$2"
+        shift 2
+        ;;
+      --json)
+        JSON_OUTPUT=true
         shift
         ;;
       -h|--help)
