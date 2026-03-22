@@ -1028,7 +1028,7 @@ launch_instance() {
     --security-group-ids "$SG_ID"
     --key-name "$KEY_NAME"
     --block-device-mappings "file://$bdm_file"
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME}]"
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME},{Key=Destroy,Value=nuke}]"
     --count 1
     --output json
   )
