@@ -215,7 +215,7 @@ validate_user_data_file() {
 }
 
 validate_os_name() {
-  case "${OS_NAME,,}" in
+  case "$OS_NAME" in
     amazonlinux|ubuntu|rhel|fedora|windows) ;;
     *) fail "Unsupported OS '$OS_NAME'. Use: amazonlinux | ubuntu | rhel | fedora | windows" ;;
   esac
@@ -508,7 +508,7 @@ choose_storage_interactively() {
   if [[ -z "$DATA_DISK_SIZE" && "$NON_INTERACTIVE" == false ]]; then
     local ans
     read -r -p "Attach extra EBS volume? (y/n): " ans
-    ans="${ans,,}"
+    ans="$(printf '%s' "$ans" | tr '[:upper:]' '[:lower:]')"
     if [[ "$ans" == "y" ]]; then
       DATA_DISK_SIZE="$(prompt_non_empty 'Enter extra disk size in GiB: ')"
     fi
@@ -803,7 +803,7 @@ resolve_os() {
   if [[ -z "$OS_NAME" ]]; then
     choose_os_interactively
   fi
-  OS_NAME="${OS_NAME,,}"
+  OS_NAME="$(printf '%s' "$OS_NAME" | tr '[:upper:]' '[:lower:]')"
   validate_os_name
   info "Selected OS: $OS_NAME"
 }
@@ -1015,7 +1015,7 @@ launch_instance() {
   if [[ "$NON_INTERACTIVE" == false && "$DRY_RUN" == false ]]; then
     local confirm
     read -r -p "Launch instance now? (y/n): " confirm
-    confirm="${confirm,,}"
+    confirm="$(printf '%s' "$confirm" | tr '[:upper:]' '[:lower:]')"
     [[ "$confirm" == "y" ]] || fail "Launch cancelled."
   fi
 
