@@ -206,7 +206,7 @@ validate_numeric_gib() {
   local label="$1"
   local value="$2"
   [[ "$value" =~ ^[0-9]+$ ]] || fail "$label must be numeric."
-  (( value > 0 )) || fail "$label must be greater than 0."
+  (( value > 7 )) || fail "$label must be greater than 8."
 }
 
 validate_user_data_file() {
@@ -396,7 +396,11 @@ choose_sg_interactively() {
     --output json | jq 'sort_by(.Name, .GroupId)')"
 
   count="$(echo "$data" | jq 'length')"
-  (( count > 0 )) || fail "No security groups found in VPC $VPC_ID"
+  if (( count == 0 )); then
+    info "No security groups found in VPC $VPC_ID. Creating via manage_aws_security.sh..."
+    create_sg_via_external_script
+    return 0
+  fi
 
   echo
   echo "==== Select Security Group ===="
@@ -407,11 +411,15 @@ choose_sg_interactively() {
       "$(echo "$data" | jq -r ".[$i].GroupId")" \
       "$(echo "$data" | jq -r ".[$i].Desc")"
   done
+  printf " %d) Create new security group via manage_aws_security.sh\n" "$((count+1))"
 
   while true; do
-    read -r -p "Choose Security Group 1-$count: " choice
+    read -r -p "Choose Security Group 1-$((count+1)): " choice
     if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= count )); then
       SG_ID="$(echo "$data" | jq -r ".[$((choice-1))].GroupId")"
+      return 0
+    elif [[ "$choice" == "$((count+1))" ]]; then
+      create_sg_via_external_script
       return 0
     fi
     echo "Invalid selection."
@@ -429,7 +437,7 @@ choose_key_interactively() {
 
   count="$(echo "$data" | jq 'length')"
   if (( count == 0 )); then
-    info "No key pairs found in region $AWS_REGION. Delegating key creation to manage_aws_security.sh..."
+    info "No key pairs found in region $AWS_REGION. Creating via manage_aws_security.sh..."
     create_key_via_external_script
     return 0
   fi
@@ -442,11 +450,15 @@ choose_key_interactively() {
       "$(echo "$data" | jq -r ".[$i].KeyName")" \
       "$(echo "$data" | jq -r ".[$i].KeyPairId")"
   done
+  printf " %d) Create new key pair via manage_aws_security.sh\n" "$((count+1))"
 
   while true; do
-    read -r -p "Choose Key Pair 1-$count: " choice
+    read -r -p "Choose Key Pair 1-$((count+1)): " choice
     if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= count )); then
       KEY_NAME="$(echo "$data" | jq -r ".[$((choice-1))].KeyName")"
+      return 0
+    elif [[ "$choice" == "$((count+1))" ]]; then
+      create_key_via_external_script
       return 0
     fi
     echo "Invalid selection."
@@ -502,7 +514,7 @@ choose_instance_type_interactively() {
 }
 
 choose_storage_interactively() {
-  [[ -n "$ROOT_DISK_SIZE" ]] || ROOT_DISK_SIZE="$(prompt_non_empty 'Enter root disk size in GiB: ')"
+  [[ -n "$ROOT_DISK_SIZE" ]] || ROOT_DISK_SIZE="$(prompt_non_empty 'Enter root disk size in GiB (8-1024): ')"
   validate_numeric_gib "Root disk size" "$ROOT_DISK_SIZE"
 
   if [[ -z "$DATA_DISK_SIZE" && "$NON_INTERACTIVE" == false ]]; then
@@ -607,12 +619,16 @@ create_subnet_via_external_script() {
 
 create_sg_via_external_script() {
   [[ -n "$VPC_ID" ]] || fail "Cannot create security group without VPC_ID"
-  info "Delegating Security Group creation to external script..."
-  # Example:
-  # result="$("$SCRIPT_DIR/create_security_group.sh" --region "$AWS_REGION" --vpc-id "$VPC_ID" --json)"
-  # SG_ID="$(echo "$result" | jq -r '.security_group_id')"
+  info "Delegating Security Group creation to manage_aws_security.sh in region $AWS_REGION..."
 
-  fail "Hook not implemented: create_sg_via_external_script"
+  local result
+  result="$("$SCRIPT_DIR/manage_aws_security.sh" --region "$AWS_REGION" --vpc-id "$VPC_ID" --create-sg --json)"
+
+  SG_ID="$(echo "$result" | jq -r '.security_group_id // .group_id // empty')"
+
+  [[ -n "$SG_ID" ]] || fail "Failed to parse security_group_id from manage_aws_security.sh output"
+
+  info "Created Security Group: $SG_ID"
 }
 
 create_key_via_external_script() {
@@ -989,7 +1005,7 @@ print_summary() {
   echo "Key Pair        : $KEY_NAME"
   echo "OS              : $OS_NAME"
   echo "AMI             : $AMI_ID"
-  echo "Instance Type   : $INSTANCE_TYPE"
+  echo "Instance Type   : $INSTANCE_TYPE and Destroy=nuke tag (will be terminated by cleanup script)"
   echo "Root Disk       : ${ROOT_DISK_SIZE} GiB"
   if [[ "$ADD_EXTRA_DISK" == true ]]; then
     echo "Extra Disk      : ${DATA_DISK_SIZE} GiB (kept after termination)"

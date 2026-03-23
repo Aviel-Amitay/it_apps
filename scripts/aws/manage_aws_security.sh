@@ -9,7 +9,9 @@ AWS_REGION="${AWS_REGION:-il-central-1}"
 SCRIPT_NAME="$(basename "$0")"
 JSON_OUTPUT="no"
 CREATE_KEY_ONLY="no"
+CREATE_SG_ONLY="no"
 REGION_FORWARDED="no"
+FORWARDED_VPC_ID=""
 
 DEFAULT_OFFICE_CIDR="172.20.1.0/16"
 DEFAULT_WEB_PORTS="80,443,8080,8443,3000,123"
@@ -43,6 +45,8 @@ Usage:
 Options:
   -p, --profile NAME   AWS CLI profile to use (default: ${AWS_PROFILE})
   -r, --region  NAME   AWS region to use (default: ${AWS_REGION})
+      --vpc-id ID      Use this VPC directly for delegated security group creation
+      --create-sg      Jump directly to security group creation
       --create-key     Jump directly to key pair creation
       --json           Print machine-readable JSON for delegated flows
   -h, --help           Show this help
@@ -578,6 +582,12 @@ create_new_security_group_workflow() {
 
   prompt_sg_profile_and_apply "$sg_id"
 
+  if [[ "$JSON_OUTPUT" == "yes" ]]; then
+    printf '{"security_group_id":"%s","group_id":"%s","group_name":"%s","vpc_id":"%s","region":"%s"}\n' \
+      "$sg_id" "$sg_id" "$sg_name" "$vpc_id" "$AWS_REGION"
+    return 0
+  fi
+
   echo
   echo "Created security group:"
   aws_cli ec2 describe-security-groups \
@@ -906,6 +916,15 @@ parse_args() {
         REGION_FORWARDED="yes"
         shift 2
         ;;
+      --vpc-id)
+        [[ $# -lt 2 ]] && die "Missing value for $1"
+        FORWARDED_VPC_ID="$2"
+        shift 2
+        ;;
+      --create-sg)
+        CREATE_SG_ONLY="yes"
+        shift
+        ;;
       --create-key)
         CREATE_KEY_ONLY="yes"
         shift
@@ -932,6 +951,17 @@ main() {
   require_command awk
   require_command xargs
   require_command tr
+
+  if [[ "$CREATE_SG_ONLY" == "yes" ]]; then
+    log "Using AWS profile: $AWS_PROFILE"
+    log "Using AWS region : $AWS_REGION"
+    if [[ -z "$FORWARDED_VPC_ID" ]]; then
+      prompt_vpc_id
+      FORWARDED_VPC_ID="$SELECTED_VPC_ID"
+    fi
+    create_new_security_group_workflow "$FORWARDED_VPC_ID"
+    exit 0
+  fi
 
   if [[ "$CREATE_KEY_ONLY" == "yes" ]]; then
     log "Using AWS profile: $AWS_PROFILE"

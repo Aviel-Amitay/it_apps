@@ -10,8 +10,9 @@ if [[ ! -d "$SCRIPT_BASE" ]]; then
 fi
 
 LINUX_SCRIPT_DIR="$SCRIPT_BASE/linux_env"
+AWS_SCRIPT_DIR="$SCRIPT_BASE/aws"
 CHEF_SCRIPT_DIR="$SCRIPT_BASE/chef"
-LOG_FILE="$SCRIPT_BASE/launcher.log"
+LOG_FILE="$SCRIPT_BASE/../launcher.log"
 
 # Prompt for the initiating user if not already set
 if [[ -z "$it_username" ]]; then
@@ -48,6 +49,12 @@ MACHINE_ACTIONS=(
   "new_vm.sh:Create a new VM"
 )
 
+AWS_ACTIONS=(
+  "build_multi_vpc.sh:Build a multi-VPC environment in AWS"
+  "manage_aws_security.sh:Create and manage AWS SSH and security groups"
+  "manage_ec2_instances.sh:Create a new EC2 instance in AWS"
+)
+
 BACKUP_ACTIONS=(
   "automate_external_backup.sh:Initial monthly disk backup"
 )
@@ -58,7 +65,8 @@ show_main_menu() {
   echo "1 - User Actions"
   echo "2 - Environment Actions"
   echo "3 - Machine Actions"
-  echo "4 - Backup Actions"
+  echo "4 - AWS Actions"
+  echo "5 - Backup Actions"
   echo "q - Quit"
   echo "=========================================="
 }
@@ -88,6 +96,8 @@ run_script_menu() {
         full_path="$SCRIPT_BASE/$script_file"
       elif [[ -f "$LINUX_SCRIPT_DIR/$script_file" ]]; then
         full_path="$LINUX_SCRIPT_DIR/$script_file"
+      elif [[ -f "$AWS_SCRIPT_DIR/$script_file" ]]; then
+        full_path="$AWS_SCRIPT_DIR/$script_file"
       elif [[ -f "$CHEF_SCRIPT_DIR/$script_file" ]]; then
         full_path="$CHEF_SCRIPT_DIR/$script_file"
       else
@@ -119,12 +129,13 @@ run_script_menu() {
 # Main loop
 while true; do
   show_main_menu
-  read -rp "Choose a category [1–4 or q]: " choice
+  read -rp "Choose a category [1–5 or q]: " choice
   case "$choice" in
     1) run_script_menu USER_ACTIONS ;;
     2) run_script_menu ENV_ACTIONS ;;
     3) run_script_menu MACHINE_ACTIONS ;;
-    4) run_script_menu BACKUP_ACTIONS ;;
+    4) run_script_menu AWS_ACTIONS ;;
+    5) run_script_menu BACKUP_ACTIONS ;;
     q) echo "Goodbye!"; exit 0 ;;
     *) echo "Invalid option. Try again." ;;
   esac
