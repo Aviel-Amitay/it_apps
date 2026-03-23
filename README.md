@@ -41,17 +41,33 @@ These scripts can be executed individually or via the `launcher-app.sh` wizard. 
 
 Scripts in `linux_env` focus on user and project environment setup on Linux hosts.  They help manage home directories, project storage and automount configurations:
 
-- **create_project_work_dir.sh**: prompts for user, project and manager storage path, then constructs the network path and creates project work directories with the appropriate group and permissions.  It handles differences between employees and contractors.
-- **update_autofs_maps.sh**: updates AutoFS map files.  It parses arguments, determines the project template from Chef cookbooks, locates entries for the copy user, builds new map entries for the specified user and project, commits changes via Git and runs Chef to deploy them.  Use this script when adding new projects or updating automount configurations.
+- **[create_project_work_dir.sh](./scripts/linux_env/create_project_work_dir.sh)**: prompts for user, project and manager storage path, then constructs the network path and creates project work directories with the appropriate group and permissions.  It handles differences between employees and contractors.
+- **[update_autofs_maps.sh](./scripts/linux_env/update_autofs_maps.sh)**: updates AutoFS map files.  It parses arguments, determines the project template from Chef cookbooks, locates entries for the copy user, builds new map entries for the specified user and project, commits changes via Git and runs Chef to deploy them.  Use this script when adding new projects or updating automount configurations.
+
+## `scripts/aws` directory
+The `aws` directory contain an option to manage the most tool resources, such as:
+- **[build_multi_vpc.sh](./scripts/aws/build_multi_vpc.sh)** Create a multi VPC 1 or 2 in a range of region with:
+    - One Public and Private subnet.  
+    - Internet Gateway.
+    - Route table for each subnet.
+    - NAT Gateway.
+- **[manage_ec2_instance.sh](./scripts/aws/manage_ec2_instance.sh)** Manage EC2 with an option for:
+  - Get a list of current Security groups.  
+    
+  - Create a new Security group with custom ports, or for all of office CIDR.
+  - Create unlimited of an SSH keys.
+- **[manage_ec2_instance.sh](./scripts/aws/manage_aws_security.sh)** Manage SSH and Security groups.
+
+- Read more at the **[AWS_README.md](./scripts/aws/AWS_README.md)** file.  
 
 ## `scripts/chef` directory
 
 The `chef` directory contains tools for managing the Chef configuration management environment:
 
-- **edit_cookbook_metadata.sh**: bumps the patch version in a cookbook’s `metadata.rb` file.  It lets you select a cookbook, confirms the change and runs an SSH command to edit the file.
-- **upload_cookbook.sh**: updates the Chef repository on the build server and uploads selected or all cookbooks using `knife cookbook upload`.
-- **edit_chef_node.sh**: opens a Chef node for editing with `knife node edit` on the Chef server.
-- **run_full_chef_client.sh**: runs `chef-client` across nodes matching a specified role.  It prompts for the role, builds a `knife ssh` command, logs output and executes it, allowing bulk configuration updates.
+- **[edit_cookbook_metadata.sh](./scripts/chef/edit_cookbook_metadata.sh)**: bumps the patch version in a cookbook’s `metadata.rb` file.  It lets you select a cookbook, confirms the change and runs an SSH command to edit the file.
+- **[upload_cookbook.sh](./scripts/chef/upload_cookbook.sh)**: updates the Chef repository on the build server and uploads selected or all cookbooks using `knife cookbook upload`.
+- **[edit_chef_node.sh](./scripts/chef/edit_chef_node.sh)**: opens a Chef node for editing with `knife node edit` on the Chef server.
+- **[run_full_chef_client.sh](./scripts/chef/run_full_chef_client.sh)**: runs `chef-client` across nodes matching a specified role.  It prompts for the role, builds a `knife ssh` command, logs output and executes it, allowing bulk configuration updates.
 
 Other scripts in this directory support environment‑specific tasks such as running `chef-client` only on AutoFS nodes.  These tools streamline Chef operations and keep configuration in sync.
 
