@@ -14,7 +14,18 @@
 # set -x # Remove the comment for debug
 set -euo pipefail
 
-ROOT_DIR="/mnt/x/it_apps"
+
+# Prompt user for the root directory where the repo was downloaded
+read -rp "Enter the root directory where the repo is downloaded (default: /mnt/x/it_apps): " ROOT_DIR
+ROOT_DIR="${ROOT_DIR:-/mnt/x/it_apps}"
+
+# Validate that the provided ROOT_DIR exists and contains expected files (e.g., scripts directory)
+if [[ ! -d "$ROOT_DIR" || ! -d "$ROOT_DIR/scripts" ]]; then
+  echo "❌ ERROR: Invalid ROOT_DIR. Ensure the directory exists and contains a 'scripts' subdirectory."
+  echo "   Provided path: $ROOT_DIR"
+  exit 1
+fi
+
 SCRIPT_BASE="$ROOT_DIR/scripts"
 LAUNCHER_FILE="$ROOT_DIR/launcher-app.sh"
 LOG_FILE="$ROOT_DIR/customize_company_updated.log"
@@ -81,7 +92,7 @@ echo "Current Email Domain: $previous_external_email_domain"
 
 echo "========== Update domain info for your comapny =========="
 echo ""
-read -t 10 -rp "Do you want to change these values? [y/N]: " change_domain
+read -t 120 -rp "Do you want to change these values? [y/N]: " change_domain
 echo ""
 
 if [[ "$change_domain" =~ ^[Yy]$ ]]; then
