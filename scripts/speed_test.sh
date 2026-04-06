@@ -6,7 +6,7 @@
 # Modified: Jan 29 2025
 ################################################################################
 
-curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python - ; exit
+curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - ; exit
 	;;
 	[a-z][A-Z]) echo "Please insert valid option"
 	;;
