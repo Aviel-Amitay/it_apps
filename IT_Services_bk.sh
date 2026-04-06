@@ -1,5 +1,15 @@
 #!/bin/bash
 
+################################################################################
+# IT Services Bk
+# Description: Automation script for 'IT_Services_bk.sh'
+# Author : Aviel Amitay
+# GitHub : https://github.com/Aviel-Amitay/it_apps
+# Modified: Apr 06 2026
+################################################################################
+
+
+
 while  [[ $HOSTNAME = x-infra01 ]] || [[ $HOSTNAME = x-infra01.amitay.dev ]] || [[ $HOSTNAME = xsit-vnc01 ]] || [[ $HOSTNAME = xsit-vnc01.amitay.dev ]] 
 do
 read -p "Welcome! Please choose action from the list: 
