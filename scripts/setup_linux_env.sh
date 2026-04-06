@@ -5,14 +5,16 @@
 # Description: Prepare Linux environment 
 # Author : Aviel Amitay
 # GitHub : https://github.com/Aviel-Amitay
-# Modified: Jun 12 2025
+# Modified: Apr 5 2026
 ################################################################################
 
 
 #########################
 # Global Configuration #
 #########################
-SCRIPT_BASE="/it_apps/scripts"
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_BASE="$ROOT_DIR/scripts"
 
 # Help
 
@@ -190,8 +192,8 @@ fi
 work_dir="/projects/$projectname/work/$username"
 echo "Path of work_dir is: "$work_dir""
 
-# **Handling for arava, arad, bareket projects (Use /mnt)**
-if [[ "$projectname" == "arava" || "$projectname" == "arad" || "$projectname" == "bareket" ]]; then
+# **Handling for rose, tulip, lily projects (Use /mnt)**
+if [[ "$projectname" == "rose" || "$projectname" == "tulip" || "$projectname" == "lily" ]]; then
     echo "Processing project: $projectname"
 
     # Assign volume based on username's first letter
@@ -246,12 +248,12 @@ fi
 fi
 
 
-# **Handling for Alon**
-if [[ "$projectname" == "alon" ]]; then
+# **Handling for daisy**
+if [[ "$projectname" == "daisy" ]]; then
     echo "Processing project: $projectname"
 
-    alon_path="/net/<SERVER>/project_alon/work"
-    user_dir="$alon_path/$username"
+    daisy_path="/net/<SERVER>/project_daisy/work"
+    user_dir="$daisy_path/$username"
 
     mkdir -p "$user_dir"
 
@@ -275,8 +277,8 @@ if [[ "$projectname" == "alon" ]]; then
     echo ""
 fi
 
-# **Handling for arbel, bental, eshkol projects (Use /projects and call external script)**
-if [[ "$projectname" == "arbel" || "$projectname" == "bental" || "$projectname" == "eshkol" ]]; then
+# **Handling for orchid, iris, peony projects (Use /projects and call external script)**
+if [[ "$projectname" == "orchid" || "$projectname" == "iris" || "$projectname" == "peony" ]]; then
 
 # Define the work directory path before checking
 work_dir="/projects/$projectname/work/$username"
@@ -285,11 +287,10 @@ echo "Run $projectname debug_mode"
     if [[ ! -d "$work_dir" ]]; then
         echo "user directory for '$username' not found under /projects/$projectname/work."
         echo "executing external script "create_project_work_dir.sh" to create the work directory..."
-        sh "$SCRIPT_BASE/create_project_work_dir.sh" -user "$username" -project "$projectname" -copy "$copy_enabled"
+        sh "$SCRIPT_BASE/linux_env/create_project_work_dir.sh" -user "$username" -project "$projectname" -copy "$copy_enabled"
         echo ""
         echo "Run external script "update_autofs_maps""
-        # sh /home/aviela/it_services/scripts/update_autofs_maps.sh -user "$username" -project "$projectname" -copy "$copy_enabled" -whoami "$it_username"
-        sh "$SCRIPT_BASE/update_autofs_maps.sh" -user "$username" -project "$projectname" -copy "$copy_enabled" -whoami "$it_username"
+        sh "$SCRIPT_BASE/linux_env/update_autofs_maps.sh" -user "$username" -project "$projectname" -copy "$copy_enabled" -whoami "$it_username"
     fi
 
     echo ""
@@ -304,9 +305,9 @@ echo "Run $projectname debug_mode"
 fi
 
 # **Only show warning if it is NOT a known project**
-if [[ "$projectname" != "arava" && "$projectname" != "arad" && "$projectname" != "bareket" && \
-      "$projectname" != "alon" && \
-      "$projectname" != "arbel" && "$projectname" != "bental" && "$projectname" != "eshkol" ]]; then
+if [[ "$projectname" != "rose" && "$projectname" != "tulip" && "$projectname" != "lily" && \
+      "$projectname" != "daisy" && \
+      "$projectname" != "orchid" && "$projectname" != "iris" && "$projectname" != "peony" ]]; then
     echo ""
     echo "*** Attention: Project '$projectname' is not a standard supported project, please create a work directory manually. ***"
     echo ""
@@ -440,10 +441,10 @@ read -t 200 -p "Would you like to update autofs maps? [y/n]: " confirmation
 if [[ "$confirmation" =~ ^[yY]$ ]]; then
     echo "Running external script 'upload_cookbook.sh'"
     echo ""
-    sh "$SCRIPT_BASE/upload_cookbook.sh "
+    sh "$SCRIPT_BASE/chef/upload_cookbook.sh "
     echo ""
     echo "Update update_autofs_maps"
-    sh "$SCRIPT_BASE/run_full_chef_client.sh" -role tags:update_autofs_maps ; exit  
+    sh "$SCRIPT_BASE/chef/run_full_chef_client.sh" -role tags:update_autofs_maps ; exit  
 else
   echo "Autofs maps update skipped."
 fi

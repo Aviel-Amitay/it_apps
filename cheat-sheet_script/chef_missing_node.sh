@@ -1,4 +1,14 @@
 #!/bin/bash
+
+################################################################################
+# Chef Missing Node
+# Description: Automation script for 'chef_missing_node.sh'
+# Author : Aviel Amitay
+# GitHub : https://github.com/Aviel-Amitay/it_apps
+# Modified: Apr 06 2026
+################################################################################
+
+
 set -euo pipefail
 
 cat <<'EOF'

@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+
+################################################################################
+# Build Multi Vpc
+# Description: Automation script for 'build_multi_vpc.sh'
+# Author : Aviel Amitay
+# GitHub : https://github.com/Aviel-Amitay/it_apps
+# Modified: Apr 06 2026
+################################################################################
+
+
 set -euo pipefail
 
 ###############################################################################

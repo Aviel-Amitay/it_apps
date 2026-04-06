@@ -1,5 +1,15 @@
 #!/bin/bash
 
+################################################################################
+# Sge Actions
+# Description: Automation script for 'sge_actions.sh'
+# Author : Aviel Amitay
+# GitHub : https://github.com/Aviel-Amitay/it_apps
+# Modified: Apr 06 2026
+################################################################################
+
+
+
 read -p "SGE Menu: Please choose action from the list: 
 		1  - Show all Jobs
 		2  - Add submit host

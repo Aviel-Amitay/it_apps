@@ -14,10 +14,29 @@
 # set -x # Remove the comment for debug
 set -euo pipefail
 
+cat <<'EOF'
+Welcome to the Company Customization Script!
+This utility will help you update company-specific details such as:
+- Internal AD domain (e.g., example.local)
+- External email domain (e.g., example.com)
+- Usernames and server names used in scripts
+- SCRIPT_BASE path in launcher files
+- NFS backup IPs in the automate_external_backup script 
+You can choose to preview all changes in a dry-run mode before applying them.
+
+Note: This script assumes a certain structure in your scripts and may not catch every instance of these values. Always review the changes after running, especially if you have custom scripts or variations.
+
+#### If this script was useful, consider giving it a ⭐ on GitHub:
+  👉 https://github.com/Aviel-Amitay/it_apps
+EOF
 
 # Prompt user for the root directory where the repo was downloaded
-read -rp "Enter the root directory where the repo is downloaded (default: /mnt/x/it_apps): " ROOT_DIR
-ROOT_DIR="${ROOT_DIR:-/mnt/x/it_apps}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo ""  
+echo "########### Company Customization Script ##########"
+echo "Current ROOT_DIR is: $ROOT_DIR"
+echo "###################################################"
+echo ""
 
 # Validate that the provided ROOT_DIR exists and contains expected files (e.g., scripts directory)
 if [[ ! -d "$ROOT_DIR" || ! -d "$ROOT_DIR/scripts" ]]; then
