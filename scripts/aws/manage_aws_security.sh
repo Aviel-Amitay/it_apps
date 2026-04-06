@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+
+################################################################################
+# Manage Aws Security
+# Description: Automation script for 'manage_aws_security.sh'
+# Author : Aviel Amitay
+# GitHub : https://github.com/Aviel-Amitay/it_apps
+# Modified: Apr 06 2026
+################################################################################
+
+
 set -euo pipefail
 
 ###############################################################################
