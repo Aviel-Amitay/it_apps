@@ -1,18 +1,29 @@
 #!/bin/bash
 
-#set -x
+################################################################################
+# Launcher-app
+# Description: A centralized launcher for IT services scripts, 
+#              providing a user-friendly menu to execute various tasks related to user management, 
+#              environment setup, machine operations, AWS management, and backup automation.
+# Author : Aviel Amitay
+# GitHub : https://github.com/Aviel-Amitay/it_apps
+# Modified: Apr 06 2026
+################################################################################
 
-SCRIPT_BASE="/it_apps/scripts"
+# set -x
 
-if [[ ! -d "$SCRIPT_BASE" ]]; then
-  echo "❌ ERROR: SCRIPT_BASE directory '$SCRIPT_BASE' not found!"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$ROOT_DIR/scripts"
+
+if [[ ! -d "$SCRIPT_DIR" ]]; then
+  echo "❌ ERROR: SCRIPT_DIR directory '$SCRIPT_DIR' not found!"
   exit 1
 fi
 
-LINUX_SCRIPT_DIR="$SCRIPT_BASE/linux_env"
-AWS_SCRIPT_DIR="$SCRIPT_BASE/aws"
-CHEF_SCRIPT_DIR="$SCRIPT_BASE/chef"
-LOG_FILE="$SCRIPT_BASE/../launcher.log"
+LINUX_SCRIPT_DIR="$SCRIPT_DIR/linux_env"
+AWS_SCRIPT_DIR="$SCRIPT_DIR/aws"
+CHEF_SCRIPT_DIR="$SCRIPT_DIR/chef"
+LOG_FILE="$ROOT_DIR/launcher.log"
 
 # Prompt for the initiating user if not already set
 if [[ -z "$it_username" ]]; then
@@ -52,7 +63,7 @@ MACHINE_ACTIONS=(
 AWS_ACTIONS=(
   "build_multi_vpc.sh:Build a multi-VPC environment in AWS"
   "manage_aws_security.sh:Create and manage AWS SSH and security groups"
-  "manage_ec2_instances.sh:Create a new EC2 instance in AWS"
+  "manage_ec2_instance.sh:Create a new EC2 instance in AWS"
 )
 
 BACKUP_ACTIONS=(
@@ -92,8 +103,8 @@ run_script_menu() {
       description="${category[index]#*:}"
 
       # Find the script path
-      if [[ -f "$SCRIPT_BASE/$script_file" ]]; then
-        full_path="$SCRIPT_BASE/$script_file"
+      if [[ -f "$SCRIPT_DIR/$script_file" ]]; then
+        full_path="$SCRIPT_DIR/$script_file"
       elif [[ -f "$LINUX_SCRIPT_DIR/$script_file" ]]; then
         full_path="$LINUX_SCRIPT_DIR/$script_file"
       elif [[ -f "$AWS_SCRIPT_DIR/$script_file" ]]; then
@@ -140,4 +151,3 @@ while true; do
     *) echo "Invalid option. Try again." ;;
   esac
 done
-
