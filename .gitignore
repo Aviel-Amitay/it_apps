@@ -1,7 +1,11 @@
 # DIRS
+venv/
+__pycache__/
 
 # FILES
-launcher.log
+.env
+*.pyc
 
 # Logs
 *.log
+launcher.log
