@@ -322,7 +322,7 @@ choose_vpc_interactively() {
   local data count choice
   data="$(aws ec2 describe-vpcs \
     --region "$AWS_REGION" \
-    --query 'Vpcs[].{VpcId:VpcId,Cidr:CidrBlock,Name: join(``, Tags[?Key==`Name`].Value) || `NoName`}' \
+    --query 'Vpcs[].{VpcId:VpcId,Cidr:CidrBlock,Name: Tags[?Key==`Name` && Value != null] | [0].Value || `NoName`}' \
     --output json | jq 'sort_by(.Name, .VpcId)')"
 
   count="$(echo "$data" | jq 'length')"
@@ -367,7 +367,7 @@ choose_subnet_interactively() {
   data="$(aws ec2 describe-subnets \
     --region "$AWS_REGION" \
     --filters "Name=vpc-id,Values=$VPC_ID" \
-    --query 'Subnets[].{SubnetId:SubnetId,Az:AvailabilityZone,Cidr:CidrBlock,Name: join(``, Tags[?Key==`Name`].Value) || `NoName`}' \
+    --query 'Subnets[].{SubnetId:SubnetId,Az:AvailabilityZone,Cidr:CidrBlock,Name: Tags[?Key==`Name` && Value != null] | [0].Value || `NoName`}' \
     --output json | jq 'sort_by(.Az, .Name, .SubnetId)')"
 
   count="$(echo "$data" | jq 'length')"
