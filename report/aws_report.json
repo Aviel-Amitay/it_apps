@@ -1,0 +1,29 @@
+{
+  "source": "aws",
+  "action": "ec2_create",
+  "subject": "AWS EC2 instance creation summary",
+  "send_mode": "one_email",
+  "recipients": [
+    "devops@example.com"
+  ],
+  "body_type": "plain",
+  "generated_at": "2026-07-06T15:34:53",
+  "environment": "dev",
+  "dummy": true,
+  "body": "##########################################\nTest email - This email is a test.\n##########################################\nAWS EC2 instance created successfully.\n\nRegion: eu-west-1\nVPC ID: vpc-0123456789abcdef0\nSubnet ID: subnet-0123456789abcdef0\nSecurity Group: sg-0123456789abcdef0\nKey Pair: aws-2026-07-06-eu-west-1-devops\nInstance ID: i-0123456789abcdef0\nInstance Type: t3.micro\nPrivate IP: 10.10.1.25\nStatus: running",
+  "records": [
+    {
+      "resource": "ec2_instance",
+      "name": "dev-tools-01",
+      "id": "i-0123456789abcdef0",
+      "region": "eu-west-1",
+      "status": "running"
+    },
+    {
+      "resource": "security_group",
+      "name": "dev-tools-sg",
+      "id": "sg-0123456789abcdef0",
+      "status": "attached"
+    }
+  ]
+}

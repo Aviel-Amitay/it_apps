@@ -1,0 +1,45 @@
+{
+  "source": "linux_env",
+  "action": "create_project_users",
+  "subject": "Project workspace access update",
+  "send_mode": "per_user",
+  "body_type": "plain",
+  "generated_at": "2026-07-06T15:11:40",
+  "environment": "prod",
+  "dummy": true,
+  "users": [
+    {
+      "username": "aviela",
+      "project": "example-project",
+      "status": "created",
+      "project_path": "/projects/example-project/work/aviela",
+      "message": "Project workspace was created successfully.",
+      "first_name": "Aviel",
+      "last_name": "Amitay",
+      "manager": "market1",
+      "email": "aviela@example.com"
+    },
+    {
+      "username": "danal",
+      "project": "example-project",
+      "status": "already_exists",
+      "project_path": "/projects/example-project/work/danal",
+      "message": "Workspace already existed; no directory changes were needed.",
+      "first_name": "Dana",
+      "last_name": "Levi",
+      "manager": "market1",
+      "email": "danal@example.com"
+    },
+    {
+      "username": "noamc",
+      "project": "another-project",
+      "status": "failed",
+      "project_path": "/projects/another-project/work/noamc",
+      "message": "Project workspace could not be created and requires review.",
+      "first_name": "Noam",
+      "last_name": "Cohen",
+      "manager": "infra",
+      "email": "noamc@example.com"
+    }
+  ]
+}

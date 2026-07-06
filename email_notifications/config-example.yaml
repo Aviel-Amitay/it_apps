@@ -1,0 +1,26 @@
+provider: debug
+
+sender:
+  email: "devops@example.com"
+  name: "DevOps Automation"
+
+smtp:
+  host: "smtp.example.com"
+  port: 587
+  tls: true
+  ssl: false
+  username: "devops@example.com"
+  password_env: "SMTP_PASSWORD"
+
+email_addressing:
+  type: "username"
+  domain: "example.com"
+  email_field: "email"
+
+send_mode: per_user
+body_type: plain
+log_path: "logs/email_notifier.log"
+
+default_recipients:
+  - "devops@example.com"
+debug_recipient: "devops-debug@example.com"

@@ -1,0 +1,3 @@
+# Sensitive SMTP credentials used by email_notifier.py.
+# Copy this file to .env and fill in real values.
+SMTP_PASSWORD=""

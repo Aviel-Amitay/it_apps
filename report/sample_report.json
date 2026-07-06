@@ -1,0 +1,21 @@
+{
+  "source": "aws_vpc_build",
+  "action": "build_summary",
+  "environment": "dev",
+  "users": [
+    {
+      "first_name": "Aviel",
+      "last_name": "Amitay",
+      "email": "aviel@example.com",
+      "status": "created",
+      "project": "devops"
+    },
+    {
+      "first_name": "Dana",
+      "last_name": "Levi",
+      "email": "dana@example.com",
+      "status": "skipped",
+      "project": "devops"
+    }
+  ]
+}

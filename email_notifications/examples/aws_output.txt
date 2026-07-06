@@ -1,0 +1,11 @@
+source: aws
+action: ec2_create
+subject: AWS EC2 instance created
+send_mode: one_email
+recipients:
+  - devops@example.com
+body_type: plain
+body: |
+  EC2 instance created successfully
+  Instance ID: i-1234567890
+  Region: eu-west-1

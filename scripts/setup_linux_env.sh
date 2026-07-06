@@ -170,7 +170,7 @@ fi
 ######################
 # Determine if user is a contractor
 if [[ "$username" == c_* ]]; then
-    contractor_companies=("am-micro_grp" "cadence" "einfochips_grp" "proteantecs" "synopsys" "terrain" "vlsi" "epp_sw_c_grp" "geminus_grp")
+    contractor_companies=("am-micro_grp" "cadence" "einfochips_grp" "proteantecs" "synopsys" "vlsi" "geminus_grp")
 
     echo "User '$username' is a contractor. Please select the group permission:"
     select contractor_company in "${contractor_companies[@]}"; do

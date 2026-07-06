@@ -1,0 +1,49 @@
+{
+  "source": "license_check",
+  "action": "license_status",
+  "subject": "License server status summary",
+  "send_mode": "one_email",
+  "recipients": [
+    "devops@example.com",
+    "it@example.com"
+  ],
+  "body_type": "plain",
+  "generated_at": "2026-07-06T15:11:40",
+  "environment": "prod",
+  "dummy": true,
+  "body": "License status check completed.\n\nOK: 2\nWarning: 1\nCritical: 1\n\nCritical license pool requires immediate cleanup or renewal.",
+  "records": [
+    {
+      "server": "license01",
+      "feature": "matlab",
+      "total": 50,
+      "used": 31,
+      "available": 19,
+      "status": "ok"
+    },
+    {
+      "server": "license01",
+      "feature": "synopsys",
+      "total": 20,
+      "used": 18,
+      "available": 2,
+      "status": "warning"
+    },
+    {
+      "server": "license02",
+      "feature": "cadence",
+      "total": 30,
+      "used": 30,
+      "available": 0,
+      "status": "critical"
+    },
+    {
+      "server": "license02",
+      "feature": "mentor",
+      "total": 15,
+      "used": 6,
+      "available": 9,
+      "status": "ok"
+    }
+  ]
+}

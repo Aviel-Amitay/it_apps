@@ -1,0 +1,26 @@
+provider: gmail
+
+sender:
+  email: "amitay.market1@gmail.com"
+  name: "DevOps Automation"
+
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  tls: true
+  ssl: false
+  username: "amitay.market1@gmail.com"
+  password_env: "SMTP_PASSWORD"
+
+email_addressing:
+  type: "custom_field"
+  domain: "gmail.com"
+  email_field: "amitay.market1"
+
+send_mode: per_user
+body_type: plain
+log_path: "logs/email_notifier.log"
+
+default_recipients:
+  - "amitay.market1@gmail.com"
+debug_recipient: "amitay.site@gmail.com"

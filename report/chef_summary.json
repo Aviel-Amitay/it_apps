@@ -1,0 +1,38 @@
+{
+  "source": "chef",
+  "action": "new_project_created",
+  "subject": "Chef, New project created",
+  "send_mode": "per_user",
+  "body_type": "table",
+  "users": [
+    {
+      "first_name": "Aviel",
+      "last_name": "Amitay",
+      "username": "aviela",
+      "projects": [
+        {
+          "name": "arbel",
+          "path": "/projects/arbel/work/aviela",
+          "status": "created"
+        },
+        {
+          "name": "bental",
+          "path": "/projects/bental/work/aviela",
+          "status": "created"
+        }
+      ]
+    },
+    {
+      "first_name": "David",
+      "last_name": "Cohen",
+      "username": "davidc",
+      "projects": [
+        {
+          "name": "eshkol",
+          "path": "/projects/eshkol/work/davidc",
+          "status": "created"
+        }
+      ]
+    }
+  ]
+}

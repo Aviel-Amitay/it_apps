@@ -1,0 +1,17 @@
+{
+  "source": "daily_check",
+  "generated_at": "2026-07-06T14:16:23.310187",
+  "environment": "dev",
+  "records": [
+    {
+      "server": "web01",
+      "status": "ok",
+      "disk_usage": "62%"
+    },
+    {
+      "server": "db01",
+      "status": "warning",
+      "disk_usage": "88%"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f5f7fb;
+      color: #172033;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #d9e0ec;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .header {
+      padding: 22px 26px;
+      background: #0f4c81;
+      color: #ffffff;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    h2 {
+      margin: 24px 0 10px;
+      font-size: 16px;
+    }
+    .subtitle {
+      margin: 0;
+      color: #dce9f7;
+    }
+    .content {
+      padding: 22px 26px 28px;
+    }
+    .stats {
+      display: inline-block;
+      margin: 0 0 16px;
+      padding: 8px 12px;
+      background: #eef5fb;
+      border: 1px solid #d5e5f3;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 9px 10px;
+      border: 1px solid #dfe6ef;
+      text-align: left;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    th {
+      background: #eef2f7;
+      color: #26364f;
+      font-weight: 700;
+    }
+    tr:nth-child(even) td {
+      background: #fafbfd;
+    }
+    .metadata th {
+      width: 220px;
+    }
+    .empty {
+      padding: 16px;
+      background: #fff8e6;
+      border: 1px solid #f0d58c;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Daily DevOps Report</h1>
+      <p class="subtitle">Source: daily_report.json | Generated: 2026-07-06 14:16:48</p>
+    </div>
+    <div class="content">
+      <div class="stats">Records: 2</div>
+      
+        <h2>Summary</h2>
+        <table class="metadata">
+          <tbody><tr><th>source</th><td>daily_check</td></tr><tr><th>generated_at</th><td>2026-07-06T14:16:23.310187</td></tr><tr><th>environment</th><td>dev</td></tr></tbody>
+        </table>
+        
+      <h2>Details</h2>
+      
+        <table>
+          <thead><tr><th>server</th><th>status</th><th>disk_usage</th></tr></thead>
+          <tbody><tr><td>web01</td><td>ok</td><td>62%</td></tr>
+<tr><td>db01</td><td>warning</td><td>88%</td></tr></tbody>
+        </table>
+        
+    </div>
+  </div>
+</body>
+</html>
